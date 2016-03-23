@@ -7,15 +7,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "linmath.h"
 #include "octtree.h"
 #include "point.h"
-#include "vec3.h"
 
 typedef struct {
-  Vec3 pos;
-  Vec3 rot;
-  Vec3 scale;
-  Vec3 params;
+  vec3 pos;
+  vec3 rot;
+  vec3 scale;
+  vec3 params;
 
   float blend;
   bool isSubtractive;
@@ -36,8 +36,8 @@ int main(void)
 {
   GLFWwindow* window;
 
-  Vec3 origin = {0, 0, 0};
-  Vec3 halfDim = {1, 1, 1};
+  vec3 origin = {0, 0, 0};
+  vec3 halfDim = {1, 1, 1};
   Point *point = point_create();
   OctTree *tree = octTree_create(origin, halfDim);
   octTree_insert(tree, point);

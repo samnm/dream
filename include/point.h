@@ -2,13 +2,13 @@
 #ifndef POINT_H_
 #define POINT_H_
 
-#include "vec3.h"
+#include "linmath.h"
 
 typedef struct point_s {
-  Vec3 pos;
-  Vec3 norm;
+  vec3 pos;
+  vec3 norm;
   float dist;
-  Vec3 color;
+  vec3 color;
 } Point;
 
 Point* point_create();

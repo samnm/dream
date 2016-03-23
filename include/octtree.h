@@ -4,12 +4,12 @@
 
 #include <stdbool.h>
 
+#include "linmath.h"
 #include "point.h"
-#include "vec3.h"
 
 typedef struct OctTree {
-  Vec3 origin;
-  Vec3 halfDim;
+  vec3 origin;
+  vec3 halfDim;
   int depth;
 
   struct OctTree *parent;
@@ -18,7 +18,7 @@ typedef struct OctTree {
   Point *data;
 } OctTree;
 
-OctTree* octTree_create(Vec3 origin, Vec3 halfDim);
+OctTree* octTree_create(vec3 origin, vec3 halfDim);
 void octTree_destroy(OctTree *octTree);
 
 bool octTree_isLeaf(OctTree *octTree);
