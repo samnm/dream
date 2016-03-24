@@ -12,9 +12,12 @@ const char * DREAM_FRAG = {
 const char * DREAM_VERT = {
   "#version 150\n"
   "in vec2 position;\n"
+  "uniform mat4 model;\n"
+  "uniform mat4 view;\n"
+  "uniform mat4 proj;\n"
   "void main()\n"
   "{\n"
-  "    gl_Position = vec4(position, 0.0, 1.0);\n"
+  "    gl_Position = proj * view * model * vec4(position, 0.0, 1.0);\n"
   "}\n"
 };
 

@@ -1,6 +1,7 @@
 #include <GLFW/glfw3.h>
 
 #include <assert.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,6 +36,9 @@ int main(void)
 {
   GLFWwindow* window;
 
+  mat4x4 ident;
+  mat4x4_identity(ident);
+
   vec3 origin = {0, 0, 0};
   vec3 halfDim = {1, 1, 1};
   Point *point = point_create();
@@ -63,6 +67,27 @@ int main(void)
 
   glfwSetKeyCallback(window, key_callback);
 
+  float r = 1.0;
+  float ang = 2*M_PI/3;
+  GLfloat vertices[] = {
+      r * sinf(0      ), r * cosf(0      ),
+      r * sinf(1 * ang), r * cosf(1 * ang),
+      r * sinf(2 * ang), r * cosf(2 * ang)
+  };
+
+  mat4x4 proj;
+  mat4x4 view;
+  mat4x4 matrix;
+
+  mat4x4_identity(matrix);
+  mat4x4_rotate(matrix, ident, 0.0f, 0.0f, 1.0f, 3.141/4);
+
+  vec3 eye = {1.2f, 1.2f, 1.2f};
+  vec3 center = {0.0f, 0.0f, 0.0f};
+  vec3 up = {0.0f, 0.0f, 1.0f};
+  mat4x4_identity(view);
+  mat4x4_look_at(view, eye, center, up);
+
   // Create Vertex Array Object
   GLuint vao;
   glGenVertexArrays(1, &vao);
@@ -71,12 +96,6 @@ int main(void)
   // Create a Vertex Buffer Object and copy the vertex data to it
   GLuint vbo;
   glGenBuffers(1, &vbo);
-
-  GLfloat vertices[] = {
-       0.0f,  0.5f,
-       0.5f, -0.5f,
-      -0.5f, -0.5f
-  };
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -104,6 +123,12 @@ int main(void)
   glEnableVertexAttribArray(posAttrib);
   glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+  GLint uniModel = glGetUniformLocation(shaderProgram, "model");
+  GLint uniView = glGetUniformLocation(shaderProgram, "view");
+  GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
+
+  glUniformMatrix4fv(uniView, 1, GL_FALSE, (const GLfloat *)&view);
+
   while (!glfwWindowShouldClose(window))
   {
     float ratio;
@@ -115,7 +140,13 @@ int main(void)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    mat4x4_perspective(proj, 60 * M_PI / 180, width / height, 1.0f, 10.0f);
+    glUniformMatrix4fv(uniProj, 1, GL_FALSE, (const GLfloat *)&proj);
+
+    mat4x4_rotate(matrix, ident, 0.0f, 0.0f, 1.0f, glfwGetTime() * 3.141);
+    glUniformMatrix4fv(uniModel, 1, GL_FALSE, (const GLfloat *)&matrix);
+
+    glDrawArrays(GL_POINTS, 0, 3);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
