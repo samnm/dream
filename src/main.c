@@ -1,4 +1,3 @@
-
 #include <GLFW/glfw3.h>
 
 #include <assert.h>
@@ -9,6 +8,7 @@
 #include "linmath.h"
 #include "octtree.h"
 #include "point.h"
+#include "shaders.h"
 
 typedef struct {
   vec3 pos;
@@ -46,6 +46,11 @@ int main(void)
   if (!glfwInit())
     exit(EXIT_FAILURE);
 
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
   window = glfwCreateWindow(640, 480, "speed dream", NULL, NULL);
   if (!window)
   {
@@ -58,6 +63,47 @@ int main(void)
 
   glfwSetKeyCallback(window, key_callback);
 
+  // Create Vertex Array Object
+  GLuint vao;
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+
+  // Create a Vertex Buffer Object and copy the vertex data to it
+  GLuint vbo;
+  glGenBuffers(1, &vbo);
+
+  GLfloat vertices[] = {
+       0.0f,  0.5f,
+       0.5f, -0.5f,
+      -0.5f, -0.5f
+  };
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  // Create and compile the vertex shader
+  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertexShader, 1, &DREAM_VERT, NULL);
+  glCompileShader(vertexShader);
+
+  // Create and compile the fragment shader
+  GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragmentShader, 1, &DREAM_FRAG, NULL);
+  glCompileShader(fragmentShader);
+
+  // Link the vertex and fragment shader into a shader program
+  GLuint shaderProgram = glCreateProgram();
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+  glBindFragDataLocation(shaderProgram, 0, "outColor");
+  glLinkProgram(shaderProgram);
+  glUseProgram(shaderProgram);
+
+  // Specify the layout of the vertex data
+  GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+  glEnableVertexAttribArray(posAttrib);
+  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
   while (!glfwWindowShouldClose(window))
   {
     float ratio;
@@ -66,29 +112,21 @@ int main(void)
     glfwGetFramebufferSize(window, &width, &height);
     ratio = width / (float) height;
 
-    glViewport(0, 0, width, height);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-    glMatrixMode(GL_MODELVIEW);
-
-    glLoadIdentity();
-    glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
-
-    glBegin(GL_TRIANGLES);
-    glColor3f(1.f, 0.f, 0.f);
-    glVertex3f(-0.6f, -0.4f, 0.f);
-    glColor3f(0.f, 1.f, 0.f);
-    glVertex3f(0.6f, -0.4f, 0.f);
-    glColor3f(0.f, 0.f, 1.f);
-    glVertex3f(0.f, 0.6f, 0.f);
-    glEnd();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+
+  glDeleteProgram(shaderProgram);
+  glDeleteShader(fragmentShader);
+  glDeleteShader(vertexShader);
+
+  glDeleteBuffers(1, &vbo);
+  glDeleteVertexArrays(1, &vao);
 
   glfwDestroyWindow(window);
 
