@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "linmath.h"
 #include "octtree.h"
@@ -11,14 +12,21 @@ OctTree* octTree_create(vec3 origin, vec3 halfDim)
   OctTree *octTree = malloc(sizeof(OctTree));
   assert(octTree != NULL);
 
-  OctTree o = *octTree;
-  o = (const struct OctTree){0};
-  o.origin[0] = origin[0];
-  o.origin[1] = origin[1];
-  o.origin[2] = origin[2];
-  o.halfDim[0] = halfDim[0];
-  o.halfDim[1] = halfDim[1];
-  o.halfDim[2] = halfDim[2];
+  octTree->depth = 0;
+  octTree->parent = NULL;
+  for (int i = 0; i < 8; ++i)
+  {
+    octTree->children[i] = NULL;
+  }
+  octTree->data = NULL;
+
+  octTree->origin[0] = origin[0];
+  octTree->origin[1] = origin[1];
+  octTree->origin[2] = origin[2];
+
+  octTree->halfDim[0] = halfDim[0];
+  octTree->halfDim[1] = halfDim[1];
+  octTree->halfDim[2] = halfDim[2];
 
   return octTree;
 }
@@ -41,6 +49,33 @@ void octTree_destroy(OctTree *octTree)
 bool octTree_isLeaf(OctTree *octTree)
 {
   return octTree->children[0] == NULL;
+}
+
+int octTree_count(OctTree *octTree)
+{
+  int count = (octTree->data != NULL) ? 1 : 0;
+  if (!octTree_isLeaf(octTree))
+  {
+    for (int i = 0; i < 8; ++i)
+      count += octTree_count(octTree->children[i]);
+  }
+  return count;
+}
+
+void octTree_get_verts(OctTree *octTree, float *verts_p, int *i_p)
+{
+  if (octTree->data != NULL)
+  {
+    verts_p[*i_p + 0] = octTree->data->pos[0];
+    verts_p[*i_p + 1] = octTree->data->pos[1];
+    verts_p[*i_p + 2] = octTree->data->pos[2];
+    i_p[0] = i_p[0] + 3;
+  }
+  if (!octTree_isLeaf(octTree))
+  {
+    for (int i = 0; i < 8; ++i)
+      octTree_get_verts(octTree->children[i], verts_p, i_p);
+  }
 }
 
 void octTree_insert(OctTree *octTree, Point *point)
@@ -85,6 +120,43 @@ void octTree_insert(OctTree *octTree, Point *point)
   {
     OctTree *tree = octTree->children[octTree_octantContainingPoint(octTree, point)];
     octTree_insert(tree, point);
+  }
+}
+
+void octTree_populate(OctTree *octTree, distance_func sdf)
+{
+  float thresh = 0.001;
+  int maxDepth = 8;
+  float distance = sdf(octTree->origin);
+  float abs_dist = fabsf(distance);
+
+  if (octTree->depth < maxDepth && abs_dist < vec3_len(octTree->halfDim))
+  {
+    vec3 new_half_dim;
+    vec3_scale(new_half_dim, octTree->halfDim, 0.5);
+
+    for (int i = 0; i < 8; ++i)
+    {
+      vec3 new_origin = {
+        octTree->origin[0] + octTree->halfDim[0] * ((i&4) > 0 ? 0.5 : -0.5),
+        octTree->origin[1] + octTree->halfDim[1] * ((i&2) > 0 ? 0.5 : -0.5),
+        octTree->origin[2] + octTree->halfDim[2] * ((i&1) > 0 ? 0.5 : -0.5),
+      };
+      OctTree *child = octTree_create(new_origin, new_half_dim);
+      child->depth = octTree->depth + 1;
+      child->parent = octTree;
+      octTree_populate(child, sdf);
+      octTree->children[i] = child;
+    }
+  }
+  else if (octTree->depth == maxDepth || abs_dist <= thresh)
+  {
+    Point *point = point_create();
+    point->pos[0] = octTree->origin[0];
+    point->pos[1] = octTree->origin[1];
+    point->pos[2] = octTree->origin[2];
+    point->dist = distance;
+    octTree->data = point;
   }
 }
 

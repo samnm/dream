@@ -9,17 +9,8 @@
 #include "linmath.h"
 #include "octtree.h"
 #include "point.h"
+#include "sdf.h"
 #include "shaders.h"
-
-typedef struct {
-  vec3 pos;
-  vec3 rot;
-  vec3 scale;
-  vec3 params;
-
-  float blend;
-  bool isSubtractive;
-} Primative;
 
 static void error_callback(int error, const char* description)
 {
@@ -32,18 +23,38 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
+struct {
+  Primative *primative;
+} sdf_args;
+
+float distance(vec4 point)
+{
+  assert(sdf_args.primative != NULL);
+  return primative_distance(sdf_args.primative, point);
+}
+
 int main(void)
 {
+  Primative *sphere = primative_create(SPHERE, ADDITIVE);
+  sdf_args.primative = sphere;
+
+  vec3 origin = {0, 0, 0};
+  vec3 halfDim = {1, 1, 1};
+  OctTree *tree = octTree_create(origin, halfDim);
+
+  octTree_populate(tree, distance);
+
+  int num_verticies = octTree_count(tree);
+  size_t vert_size = sizeof(GLfloat) * 3;
+
+  int vi = 0;
+  GLfloat *verticies = malloc(num_verticies * vert_size);
+  octTree_get_verts(tree, verticies, &vi);
+
   GLFWwindow* window;
 
   mat4x4 ident;
   mat4x4_identity(ident);
-
-  vec3 origin = {0, 0, 0};
-  vec3 halfDim = {1, 1, 1};
-  Point *point = point_create();
-  OctTree *tree = octTree_create(origin, halfDim);
-  octTree_insert(tree, point);
 
   glfwSetErrorCallback(error_callback);
 
@@ -66,14 +77,6 @@ int main(void)
   glfwSwapInterval(1);
 
   glfwSetKeyCallback(window, key_callback);
-
-  float r = 1.0;
-  float ang = 2*M_PI/3;
-  GLfloat vertices[] = {
-      r * sinf(0      ), r * cosf(0      ),
-      r * sinf(1 * ang), r * cosf(1 * ang),
-      r * sinf(2 * ang), r * cosf(2 * ang)
-  };
 
   mat4x4 proj;
   mat4x4 view;
@@ -98,7 +101,7 @@ int main(void)
   glGenBuffers(1, &vbo);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, num_verticies * vert_size, verticies, GL_STATIC_DRAW);
 
   // Create and compile the vertex shader
   GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -121,7 +124,7 @@ int main(void)
   // Specify the layout of the vertex data
   GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
   glEnableVertexAttribArray(posAttrib);
-  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
   GLint uniModel = glGetUniformLocation(shaderProgram, "model");
   GLint uniView = glGetUniformLocation(shaderProgram, "view");
@@ -140,13 +143,13 @@ int main(void)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    mat4x4_perspective(proj, 60 * M_PI / 180, width / height, 1.0f, 10.0f);
+    mat4x4_perspective(proj, 60 * M_PI / 180, ratio, 0.1f, 10.0f);
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, (const GLfloat *)&proj);
 
     mat4x4_rotate(matrix, ident, 0.0f, 0.0f, 1.0f, glfwGetTime() * 3.141);
     glUniformMatrix4fv(uniModel, 1, GL_FALSE, (const GLfloat *)&matrix);
 
-    glDrawArrays(GL_POINTS, 0, 3);
+    glDrawArrays(GL_POINTS, 0, num_verticies);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -160,6 +163,8 @@ int main(void)
   glDeleteVertexArrays(1, &vao);
 
   glfwDestroyWindow(window);
+
+  // free(verticies);
 
   glfwTerminate();
   exit(EXIT_SUCCESS);
