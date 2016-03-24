@@ -3,7 +3,7 @@ CC = cc
 EXEC = dream
 CFLAGS = -Wall -Wno-missing-braces
 FRAMEWORKS = -framework Cocoa -framework OpenGL -framework IOKit
-LIBS = -lglfw3 -lepoxy
+LIBS = -lglfw3
 SOURCES=$(wildcard src/*.c)
 OBJS=$(SOURCES:.cpp=.o)
 
@@ -14,7 +14,7 @@ all:
 	$(CC) -o bin/$(EXEC) $(OBJS) $(CFLAGS) $(LIBS) $(FRAMEWORKS) -Iinclude
 
 clean:
-	rm -f bin/$(EXEC)
+	rm -rf bin/$(EXEC)
 
 run: all
 	./bin/$(EXEC)
