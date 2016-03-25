@@ -195,7 +195,7 @@ int main(void)
 
   glfwDestroyWindow(window);
 
-  // free(verticies);
+  free(verticies);
 
   glfwTerminate();
   exit(EXIT_SUCCESS);

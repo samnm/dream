@@ -4,10 +4,15 @@
 
 #include "point.h"
 
-Point* point_create()
+Point* point_create(vec3 pos)
 {
   Point *point = malloc(sizeof(Point));
   assert(point != NULL);
+
+  point->pos[0] = pos[0];
+  point->pos[1] = pos[1];
+  point->pos[2] = pos[2];
+
   return point;
 }
 

@@ -152,11 +152,7 @@ void octTree_populate(OctTree *octTree, distance_func sdf)
   }
   else if (octTree->depth == maxDepth || abs_dist <= thresh)
   {
-    Point *point = point_create();
-    point->pos[0] = octTree->origin[0];
-    point->pos[1] = octTree->origin[1];
-    point->pos[2] = octTree->origin[2];
-    point->dist = distance;
+    Point *point = point_create(octTree->origin);
     point_calc_normal(point, sdf);
     octTree->data = point;
   }
