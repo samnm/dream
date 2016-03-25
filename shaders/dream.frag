@@ -1,5 +1,7 @@
 #version 150
 
+in vec3 inColor;
+
 out vec4 outColor;
 
 void main()

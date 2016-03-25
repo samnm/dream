@@ -63,19 +63,17 @@ int octTree_count(OctTree *octTree)
   return count;
 }
 
-void octTree_get_verts(OctTree *octTree, float *verts_p, int *i_p)
+void octTree_get_points(OctTree *octTree, Point *points_p, int *i_p)
 {
   if (octTree->data != NULL)
   {
-    verts_p[*i_p + 0] = octTree->data->pos[0];
-    verts_p[*i_p + 1] = octTree->data->pos[1];
-    verts_p[*i_p + 2] = octTree->data->pos[2];
-    i_p[0] = i_p[0] + 3;
+    points_p[*i_p] = *octTree->data;
+    i_p[0] = i_p[0] + 1;
   }
   if (!octTree_isLeaf(octTree))
   {
     for (int i = 0; i < 8; ++i)
-      octTree_get_verts(octTree->children[i], verts_p, i_p);
+      octTree_get_points(octTree->children[i], points_p, i_p);
   }
 }
 

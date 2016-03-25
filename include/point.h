@@ -6,6 +6,7 @@
 
 typedef float (*distance_func)(vec4 point);
 
+// this point object is passed directly to the GPU
 typedef struct point_s {
   vec3 pos;
   vec3 norm;

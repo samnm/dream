@@ -1,6 +1,7 @@
 #version 150
 
 in vec3 position;
+in vec3 normal;
 
 uniform mat4 model;
 uniform mat4 view;

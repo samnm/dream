@@ -27,7 +27,7 @@ int octTree_count(OctTree *octTree);
 
 void octTree_insert(OctTree *octTree, Point *point);
 void octTree_populate(OctTree *octTree, distance_func sdf);
-void octTree_get_verts(OctTree *octTree, float *verts_p, int *i_p);
+void octTree_get_points(OctTree *octTree, Point *points_p, int *i_p);
 
 int octTree_octantContainingPoint(OctTree *octTree, Point *point);
 

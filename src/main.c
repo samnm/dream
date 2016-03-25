@@ -82,11 +82,11 @@ int main(void)
   octTree_populate(tree, distance);
 
   int num_verticies = octTree_count(tree);
-  size_t vert_size = sizeof(GLfloat) * 3;
+  size_t vert_size = sizeof(Point);
 
   int vi = 0;
-  GLfloat *verticies = malloc(num_verticies * vert_size);
-  octTree_get_verts(tree, verticies, &vi);
+  Point *verticies = malloc(num_verticies * vert_size);
+  octTree_get_points(tree, verticies, &vi);
 
   GLFWwindow* window;
 
@@ -155,7 +155,15 @@ int main(void)
   // Specify the layout of the vertex data
   GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
   glEnableVertexAttribArray(posAttrib);
-  glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, vert_size, 0);
+
+  GLint normAttrib = glGetAttribLocation(shaderProgram, "normal");
+  glEnableVertexAttribArray(normAttrib);
+  glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, vert_size, (void*)(3 * sizeof(GLfloat)));
+
+  GLint colorAttrib = glGetAttribLocation(shaderProgram, "color");
+  glEnableVertexAttribArray(colorAttrib);
+  glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, vert_size, (void*)(6 * sizeof(GLfloat)));
 
   GLint uniModel = glGetUniformLocation(shaderProgram, "model");
   GLint uniView = glGetUniformLocation(shaderProgram, "view");
