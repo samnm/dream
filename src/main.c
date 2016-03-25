@@ -23,6 +23,14 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
+GLuint loadShader(GLenum type, const GLchar* src)
+{
+  GLuint shader = glCreateShader(type);
+  glShaderSource(shader, 1, &src, NULL);
+  glCompileShader(shader);
+  return shader;
+}
+
 struct {
   Primative *primative;
 } sdf_args;
@@ -103,15 +111,9 @@ int main(void)
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, num_verticies * vert_size, verticies, GL_STATIC_DRAW);
 
-  // Create and compile the vertex shader
-  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &DREAM_VERT, NULL);
-  glCompileShader(vertexShader);
-
-  // Create and compile the fragment shader
-  GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &DREAM_FRAG, NULL);
-  glCompileShader(fragmentShader);
+  // Create and compile the shaders
+  GLuint vertexShader = loadShader(GL_VERTEX_SHADER, DREAM_VERT);
+  GLuint fragmentShader = loadShader(GL_FRAGMENT_SHADER, DREAM_FRAG);
 
   // Link the vertex and fragment shader into a shader program
   GLuint shaderProgram = glCreateProgram();
