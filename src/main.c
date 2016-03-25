@@ -1,6 +1,7 @@
 #include <GLFW/glfw3.h>
 
 #include <assert.h>
+#include <float.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -32,19 +33,47 @@ GLuint loadShader(GLenum type, const GLchar* src)
 }
 
 struct {
-  Primative *primative;
+  Primative **edits;
+  int num_edits;
 } sdf_args;
 
 float distance(vec4 point)
 {
-  assert(sdf_args.primative != NULL);
-  return primative_distance(sdf_args.primative, point);
+  assert(sdf_args.num_edits <= 0 || sdf_args.edits != NULL);
+
+  float dist = FLT_MAX;
+  for (int i = 0; i < sdf_args.num_edits; ++i)
+  {
+    Primative *primative = sdf_args.edits[i];
+    switch (primative->operation)
+    {
+      case ADDITIVE:
+        dist = primative->blend > 0
+          ? smin(dist, primative_distance(primative, point), primative->blend)
+          : min(dist, primative_distance(primative, point));
+        break;
+
+      case SUBTRACTIVE:
+        dist = max(dist, -primative_distance(primative, point));
+        break;
+    }
+  }
+
+  return dist;
 }
 
 int main(void)
 {
-  Primative *sphere = primative_create(SPHERE, ADDITIVE);
-  sdf_args.primative = sphere;
+  Primative *edits[] = {
+    primative_create(SPHERE, ADDITIVE),
+    primative_create(SPHERE, ADDITIVE)
+  };
+
+  mat4x4_scale_aniso(edits[0]->transformation, edits[0]->transformation, 2.0, 1.0, 0.75);
+  edits[1]->blend = 0.5;
+
+  sdf_args.edits = edits;
+  sdf_args.num_edits = 2;
 
   vec3 origin = {0, 0, 0};
   vec3 halfDim = {1, 1, 1};

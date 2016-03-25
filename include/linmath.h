@@ -13,6 +13,19 @@
        __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
 
+static inline float mix(float x, float y, float a) {
+  return x * (1 - a) + y * a;
+}
+
+static inline float clamp(float x, float min, float max) {
+  return min(max, max(min, x));
+}
+
+static inline float smin(float a, float b, float k) {
+  float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+  return mix(b, a, h) - k * h * (1.0 - h);
+}
+
 #define LINMATH_H_DEFINE_VEC(n) \
 typedef float vec##n[n]; \
 static inline void vec##n##_add(vec##n r, vec##n const a, vec##n const b) \
