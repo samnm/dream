@@ -6,6 +6,7 @@
 
 #include "linmath.h"
 #include "octtree.h"
+#include "point.h"
 
 OctTree* octTree_create(vec3 origin, vec3 halfDim)
 {
@@ -156,6 +157,7 @@ void octTree_populate(OctTree *octTree, distance_func sdf)
     point->pos[1] = octTree->origin[1];
     point->pos[2] = octTree->origin[2];
     point->dist = distance;
+    point_calc_normal(point, sdf);
     octTree->data = point;
   }
 }

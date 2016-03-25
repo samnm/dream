@@ -7,8 +7,6 @@
 #include "linmath.h"
 #include "point.h"
 
-typedef float (*distance_func)(vec4 point);
-
 typedef struct OctTree {
   vec3 origin;
   vec3 halfDim;

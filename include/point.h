@@ -4,6 +4,8 @@
 
 #include "linmath.h"
 
+typedef float (*distance_func)(vec4 point);
+
 typedef struct point_s {
   vec3 pos;
   vec3 norm;
@@ -13,5 +15,7 @@ typedef struct point_s {
 
 Point* point_create();
 void point_destroy(Point *point);
+
+void point_calc_normal(Point *point, distance_func sdf);
 
 #endif /* POINT_H_ */
