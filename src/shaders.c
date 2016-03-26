@@ -25,6 +25,27 @@ const char * DREAM_FRAG = {
   "}\n"
 };
 
+const char * DREAM_GEOM = {
+  "#version 150\n"
+  "layout(points) in;\n"
+  "layout(points, max_vertices = 1) out;\n"
+  "in vec3 geomVert[];\n"
+  "in vec3 geomNormal[];\n"
+  "in vec3 geomColor[];\n"
+  "out vec3 fragVert;\n"
+  "out vec3 fragNormal;\n"
+  "out vec3 fragColor;\n"
+  "void main()\n"
+  "{\n"
+  "  gl_Position = gl_in[0].gl_Position;\n"
+  "  fragVert = geomVert[0];\n"
+  "  fragNormal = geomNormal[0];\n"
+  "  fragColor = geomColor[0];\n"
+  "  EmitVertex();\n"
+  "  EndPrimitive();\n"
+  "}\n"
+};
+
 const char * DREAM_VERT = {
   "#version 150\n"
   "in vec3 position;\n"
@@ -33,14 +54,14 @@ const char * DREAM_VERT = {
   "uniform mat4 model;\n"
   "uniform mat4 view;\n"
   "uniform mat4 proj;\n"
-  "out vec3 fragNormal;\n"
-  "out vec3 fragVert;\n"
-  "out vec3 fragColor;\n"
+  "out vec3 geomNormal;\n"
+  "out vec3 geomVert;\n"
+  "out vec3 geomColor;\n"
   "void main()\n"
   "{\n"
-  "  fragNormal = normal;\n"
-  "  fragVert = position;\n"
-  "  fragColor = color;\n"
+  "  geomVert = position;\n"
+  "  geomNormal = normal;\n"
+  "  geomColor = color;\n"
   "  gl_Position = proj * view * model * vec4(position, 1.0);\n"
   "}\n"
 };

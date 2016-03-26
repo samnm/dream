@@ -29,6 +29,14 @@ GLuint loadShader(GLenum type, const GLchar* src)
   GLuint shader = glCreateShader(type);
   glShaderSource(shader, 1, &src, NULL);
   glCompileShader(shader);
+
+  /*GLint status;
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+  char buffer[512];
+  glGetShaderInfoLog(shader, 512, NULL, buffer);
+  fprintf(stdout, "compiled shader\n");
+  fprintf(stdout, "%s\n", buffer);*/
+
   return shader;
 }
 
@@ -145,11 +153,13 @@ int main(void)
 
   // Create and compile the shaders
   GLuint vertexShader = loadShader(GL_VERTEX_SHADER, DREAM_VERT);
+  GLuint geometryShader = loadShader(GL_GEOMETRY_SHADER, DREAM_GEOM);
   GLuint fragmentShader = loadShader(GL_FRAGMENT_SHADER, DREAM_FRAG);
 
   // Link the vertex and fragment shader into a shader program
   GLuint shaderProgram = glCreateProgram();
   glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, geometryShader);
   glAttachShader(shaderProgram, fragmentShader);
   glBindFragDataLocation(shaderProgram, 0, "outColor");
   glLinkProgram(shaderProgram);
@@ -203,6 +213,7 @@ int main(void)
 
   glDeleteProgram(shaderProgram);
   glDeleteShader(fragmentShader);
+  glDeleteShader(geometryShader);
   glDeleteShader(vertexShader);
 
   glDeleteBuffers(1, &vbo);

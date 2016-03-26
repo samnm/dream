@@ -8,15 +8,15 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
-out vec3 fragNormal;
-out vec3 fragVert;
-out vec3 fragColor;
+out vec3 geomNormal;
+out vec3 geomVert;
+out vec3 geomColor;
 
 void main()
 {
-  fragNormal = normal;
-  fragVert = position;
-  fragColor = color;
+  geomVert = position;
+  geomNormal = normal;
+  geomColor = color;
 
   gl_Position = proj * view * model * vec4(position, 1.0);
 }
