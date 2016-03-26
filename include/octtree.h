@@ -7,6 +7,8 @@
 #include "linmath.h"
 #include "point.h"
 
+static const int OCTTREE_MAX_DEPTH = 8;
+
 typedef struct OctTree {
   vec3 origin;
   vec3 halfDim;
