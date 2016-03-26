@@ -29,17 +29,18 @@ void point_destroy(Point *point)
 void point_calc_normal(Point *point, distance_func sdf)
 {
   float eps = 0.1e-4;
-  vec3 epsX = {eps, 0.f, 0.f};
-  vec3 epsY = {0.f, eps, 0.f};
-  vec3 epsZ = {0.f, 0.f, eps};
+  vec4 pos = {point->pos[0], point->pos[1], point->pos[2], 1.0};
+  vec4 epsX = {eps, 0.f, 0.f, 0.0f};
+  vec4 epsY = {0.f, eps, 0.f, 0.0f};
+  vec4 epsZ = {0.f, 0.f, eps, 0.0f};
 
-  vec3 ppx, psx, ppy, psy, ppz, psz;
-  vec3_add(ppx, point->pos, epsX);
-  vec3_add(ppy, point->pos, epsY);
-  vec3_add(ppz, point->pos, epsZ);
-  vec3_sub(psx, point->pos, epsX);
-  vec3_sub(psy, point->pos, epsY);
-  vec3_sub(psz, point->pos, epsZ);
+  vec4 ppx, psx, ppy, psy, ppz, psz;
+  vec4_add(ppx, pos, epsX);
+  vec4_add(ppy, pos, epsY);
+  vec4_add(ppz, pos, epsZ);
+  vec4_sub(psx, pos, epsX);
+  vec4_sub(psy, pos, epsY);
+  vec4_sub(psz, pos, epsZ);
 
   point->norm[0] = sdf(ppx) - sdf(psx);
   point->norm[1] = sdf(ppy) - sdf(psy);

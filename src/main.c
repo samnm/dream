@@ -77,8 +77,9 @@ int main(void)
     primative_create(SPHERE, ADDITIVE)
   };
 
-  mat4x4_scale_aniso(edits[0]->transformation, edits[0]->transformation, 2.0, 1.0, 0.75);
-  edits[1]->blend = 0.5;
+  primative_scale(edits[0], 0.5, 1.0, 1.5);
+  primative_translate(edits[1], 0.2, 0, 0);
+  edits[1]->blend = 0.2;
 
   sdf_args.edits = edits;
   sdf_args.num_edits = 2;

@@ -24,10 +24,22 @@ void primative_destroy(Primative *primative)
   free(primative);
 }
 
+void primative_translate(Primative *primative, float x, float y, float z)
+{
+  mat4x4_translate(primative->transformation, x, y, z);
+}
+
+void primative_scale(Primative *primative, float x, float y, float z)
+{
+  mat4x4_scale_aniso(primative->transformation, primative->transformation, x, y, z);
+}
+
 float primative_distance(Primative *primative, vec4 point)
 {
   vec4 local;
-  mat4x4_mul_vec4(local, primative->transformation, point);
+  mat4x4 transformation;
+  mat4x4_invert(transformation, primative->transformation);
+  mat4x4_mul_vec4(local, transformation, point);
   local[3] = 0;
 
   switch (primative->shape)

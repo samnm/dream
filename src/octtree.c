@@ -125,7 +125,8 @@ void octTree_insert(OctTree *octTree, Point *point)
 void octTree_populate(OctTree *octTree, distance_func sdf)
 {
   float thresh = 0.001;
-  float distance = sdf(octTree->origin);
+  vec4 pos4 = {octTree->origin[0], octTree->origin[1], octTree->origin[2], 1.0f};
+  float distance = sdf(pos4);
   float abs_dist = fabsf(distance);
 
   if (octTree->depth < OCTTREE_MAX_DEPTH && abs_dist < vec3_len(octTree->halfDim))
