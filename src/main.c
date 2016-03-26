@@ -73,12 +73,12 @@ float distance(vec4 point)
 int main(void)
 {
   Primative *edits[] = {
-    primative_create(SPHERE, ADDITIVE),
+    primative_create(CUBE, ADDITIVE),
     primative_create(SPHERE, ADDITIVE),
     primative_create(SPHERE, SUBTRACTIVE)
   };
 
-  primative_scale(edits[0], 0.5, 1.0, 1.5);
+  primative_scale(edits[0], 0.4, 1.0, 1.5);
   primative_translate(edits[1], 0.2, 0, 0);
   primative_translate(edits[2], -0.3, 0, 0);
   edits[1]->blend = 0.2;

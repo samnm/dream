@@ -51,9 +51,9 @@ float primative_distance(Primative *primative, vec4 point)
     case CUBE:
     {
       vec3 p = {
-        fabsf(p[0]) - 0.5,
-        fabsf(p[1]) - 0.5,
-        fabsf(p[2]) - 0.5
+        fabsf(local[0]) - 0.5,
+        fabsf(local[1]) - 0.5,
+        fabsf(local[2]) - 0.5
       };
       float d = min(max(p[0], max(p[1], p[2])), 0.0);
       p[0] = max(p[0], 0);
