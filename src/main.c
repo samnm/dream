@@ -113,6 +113,9 @@ int main(void)
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1);
 
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+
   glfwSetKeyCallback(window, key_callback);
 
   mat4x4 proj;
@@ -184,7 +187,7 @@ int main(void)
     ratio = width / (float) height;
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mat4x4_perspective(proj, 60 * M_PI / 180, ratio, 0.1f, 10.0f);
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, (const GLfloat *)&proj);
