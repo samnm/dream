@@ -8,8 +8,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
-out vec3 geomNormal;
 out vec3 geomVert;
+out vec3 geomNormal;
 out vec3 geomColor;
 
 void main()
