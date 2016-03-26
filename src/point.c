@@ -13,6 +13,10 @@ Point* point_create(vec3 pos)
   point->pos[1] = pos[1];
   point->pos[2] = pos[2];
 
+  point->color[0] = 1.0;
+  point->color[1] = 1.0;
+  point->color[2] = 1.0;
+
   return point;
 }
 

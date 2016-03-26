@@ -171,6 +171,10 @@ int main(void)
 
   glUniformMatrix4fv(uniView, 1, GL_FALSE, (const GLfloat *)&view);
 
+  vec3 lightPos = {3.f, 0.f, 3.f};
+  GLint uniLightPos = glGetUniformLocation(shaderProgram, "lightPos");
+  glUniform3fv(uniLightPos, 1, (const GLfloat *)&lightPos);
+
   while (!glfwWindowShouldClose(window))
   {
     float ratio;
