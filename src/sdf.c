@@ -26,12 +26,19 @@ void primative_destroy(Primative *primative)
 
 void primative_translate(Primative *primative, float x, float y, float z)
 {
-  mat4x4_translate(primative->transformation, x, y, z);
+  mat4x4 translation;
+  mat4x4_translate(translation, x, y, z);
+
+  mat4x4_mul(primative->transformation, translation, primative->transformation);
 }
 
 void primative_scale(Primative *primative, float x, float y, float z)
 {
-  mat4x4_scale_aniso(primative->transformation, primative->transformation, x, y, z);
+  mat4x4 scale;
+  mat4x4_identity(scale);
+  mat4x4_scale_aniso(scale, scale, x, y, z);
+
+  mat4x4_mul(primative->transformation, scale, primative->transformation);
 }
 
 float primative_distance(Primative *primative, vec4 point)

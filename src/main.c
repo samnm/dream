@@ -81,16 +81,19 @@ int main(void)
   Primative *edits[] = {
     primative_create(CUBE, ADDITIVE),
     primative_create(SPHERE, ADDITIVE),
-    primative_create(SPHERE, SUBTRACTIVE)
+    primative_create(SPHERE, SUBTRACTIVE),
+    primative_create(SPHERE, ADDITIVE)
   };
 
   primative_scale(edits[0], 0.4, 1.0, 1.5);
   primative_translate(edits[1], 0.2, 0, 0);
   primative_translate(edits[2], -0.3, 0, 0);
+  primative_translate(edits[3], -0.5, 0, 0);
+  primative_scale(edits[3], 0.5, 0.5, 0.5);
   edits[1]->blend = 0.2;
 
   sdf_args.edits = edits;
-  sdf_args.num_edits = 3;
+  sdf_args.num_edits = 4;
 
   vec3 origin = {0, 0, 0};
   vec3 halfDim = {1, 1, 1};

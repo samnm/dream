@@ -24,7 +24,7 @@ void main()
   //calculate the cosine of the angle of incidence
   // dividing by surfaceToLight dims light the further from the light source we go
   float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight));
-  brightness = clamp(brightness, 0, 1);
+  brightness = clamp(brightness, 0, 1) * 0.8 + 0.2;
 
   outColor = vec4(brightness * fragColor, 1.0);
 }

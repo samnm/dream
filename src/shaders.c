@@ -20,7 +20,7 @@ const char * DREAM_FRAG = {
   "  //calculate the cosine of the angle of incidence\n"
   "  // dividing by surfaceToLight dims light the further from the light source we go\n"
   "  float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight));\n"
-  "  brightness = clamp(brightness, 0, 1);\n"
+  "  brightness = clamp(brightness, 0, 1) * 0.8 + 0.2;\n"
   "  outColor = vec4(brightness * fragColor, 1.0);\n"
   "}\n"
 };
