@@ -22,8 +22,8 @@ void main()
   fragNormal = geomNormal[0];
   fragColor = geomColor[0];
 
-  float rx = 0.01 + 0.02 * rand(gl_in[0].gl_Position.xy);
-  float ry = 0.01 + 0.02 * rand(gl_in[0].gl_Position.xy);
+  float rx = 0.01 + 0.005 * rand(gl_in[0].gl_Position.xy);
+  float ry = 0.01 + 0.005 * rand(gl_in[0].gl_Position.xy);
   gl_Position = gl_in[0].gl_Position + vec4(-rx, -ry, 0.0f, 0.0f);    // 1:bottom-left
   EmitVertex();
   gl_Position = gl_in[0].gl_Position + vec4( rx, -ry, 0.0f, 0.0f);    // 2:bottom-right

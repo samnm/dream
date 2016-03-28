@@ -124,12 +124,18 @@ void octTree_insert(OctTree *octTree, Point *point)
 
 void octTree_populate(OctTree *octTree, distance_func sdf)
 {
-  float thresh = 0.001;
+  float thresh = 0.002;
   vec4 pos4 = {octTree->origin[0], octTree->origin[1], octTree->origin[2], 1.0f};
   float distance = sdf(pos4);
   float abs_dist = fabsf(distance);
 
-  if (octTree->depth < OCTTREE_MAX_DEPTH && abs_dist < vec3_len(octTree->halfDim))
+  if (octTree->depth >= OCTTREE_MAX_DEPTH - 2 && abs_dist <= thresh)
+  {
+    Point *point = point_create(octTree->origin);
+    point_calc_normal(point, sdf);
+    octTree->data = point;
+  }
+  else if (octTree->depth < OCTTREE_MAX_DEPTH && abs_dist < vec3_len(octTree->halfDim))
   {
     vec3 new_half_dim;
     vec3_scale(new_half_dim, octTree->halfDim, 0.5);
@@ -147,12 +153,6 @@ void octTree_populate(OctTree *octTree, distance_func sdf)
       octTree_populate(child, sdf);
       octTree->children[i] = child;
     }
-  }
-  else if (octTree->depth == OCTTREE_MAX_DEPTH || abs_dist <= thresh)
-  {
-    Point *point = point_create(octTree->origin);
-    point_calc_normal(point, sdf);
-    octTree->data = point;
   }
 }
 

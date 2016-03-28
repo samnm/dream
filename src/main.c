@@ -103,6 +103,7 @@ int main(void)
 
   int num_verticies = octTree_count(tree);
   size_t vert_size = sizeof(Point);
+  fprintf(stdout, "num verts %d\n", num_verticies);
 
   int vi = 0;
   Point *verticies = malloc(num_verticies * vert_size);
