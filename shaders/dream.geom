@@ -12,20 +12,25 @@ out vec3 fragVert;
 out vec3 fragNormal;
 out vec3 fragColor;
 
+float rand(vec2 co) {
+  return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
 void main()
 {
   fragVert = geomVert[0];
   fragNormal = geomNormal[0];
   fragColor = geomColor[0];
 
-  float d = 0.025;
-  gl_Position = gl_in[0].gl_Position + vec4(-d, -d, 0.0f, 0.0f);    // 1:bottom-left
+  float rx = 0.01 + 0.02 * rand(gl_in[0].gl_Position.xy);
+  float ry = 0.01 + 0.02 * rand(gl_in[0].gl_Position.xy);
+  gl_Position = gl_in[0].gl_Position + vec4(-rx, -ry, 0.0f, 0.0f);    // 1:bottom-left
   EmitVertex();
-  gl_Position = gl_in[0].gl_Position + vec4( d, -d, 0.0f, 0.0f);    // 2:bottom-right
+  gl_Position = gl_in[0].gl_Position + vec4( rx, -ry, 0.0f, 0.0f);    // 2:bottom-right
   EmitVertex();
-  gl_Position = gl_in[0].gl_Position + vec4(-d,  d, 0.0f, 0.0f);    // 3:top-left
+  gl_Position = gl_in[0].gl_Position + vec4(-rx,  ry, 0.0f, 0.0f);    // 3:top-left
   EmitVertex();
-  gl_Position = gl_in[0].gl_Position + vec4( d,  d, 0.0f, 0.0f);    // 4:top-right
+  gl_Position = gl_in[0].gl_Position + vec4( rx,  ry, 0.0f, 0.0f);    // 4:top-right
   EmitVertex();
 
   EndPrimitive();
