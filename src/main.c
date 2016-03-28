@@ -43,7 +43,13 @@ GLuint loadShader(GLenum type, const GLchar* src)
 struct {
   Primative **edits;
   int num_edits;
-} sdf_args;
+} sdf_args = {0};
+
+struct {
+  vec3 pos;
+  float pitch;
+  float yaw;
+} camera = {0};
 
 float distance(vec4 point)
 {
@@ -133,14 +139,10 @@ int main(void)
   mat4x4 view;
   mat4x4 matrix;
 
-  mat4x4_identity(matrix);
-  mat4x4_rotate(matrix, ident, 0.0f, 0.0f, 1.0f, 3.141/4);
-
-  vec3 eye = {1.2f, 1.2f, 1.2f};
-  vec3 center = {0.0f, 0.0f, 0.0f};
-  vec3 up = {0.0f, 0.0f, 1.0f};
   mat4x4_identity(view);
-  mat4x4_look_at(view, eye, center, up);
+  mat4x4_identity(matrix);
+
+  vec3_set(camera.pos, 0.0f, 0.0f, 0.0f);
 
   // Create Vertex Array Object
   GLuint vao;
@@ -185,8 +187,6 @@ int main(void)
   GLint uniView = glGetUniformLocation(shaderProgram, "view");
   GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
 
-  glUniformMatrix4fv(uniView, 1, GL_FALSE, (const GLfloat *)&view);
-
   vec3 lightPos = {3.f, 0.f, 3.f};
   GLint uniLightPos = glGetUniformLocation(shaderProgram, "lightPos");
   glUniform3fv(uniLightPos, 1, (const GLfloat *)&lightPos);
@@ -202,10 +202,52 @@ int main(void)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    vec4 movement = {0, 0, 0, 1};
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+      movement[0] -= 0.1;
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+      movement[0] += 0.1;
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+      movement[2] += 0.1;
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+      movement[2] -= 0.1;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+      camera.pitch -= 0.05;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+      camera.pitch += 0.05;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+      camera.yaw += 0.05;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+      camera.yaw -= 0.05;
+
+    mat4x4 pitch_mat;
+    mat4x4_identity(pitch_mat);
+    mat4x4_rotate_X(pitch_mat, pitch_mat, camera.pitch);
+
+    mat4x4 yaw_mat;
+    mat4x4_identity(yaw_mat);
+    mat4x4_rotate_Y(yaw_mat, yaw_mat, camera.yaw);
+
+    mat4x4 inv_yaw_mat;
+    mat4x4_invert(inv_yaw_mat, yaw_mat);
+
+    vec4 rotated_movement;
+    mat4x4_mul_vec4(rotated_movement, inv_yaw_mat, movement);
+    camera.pos[0] += rotated_movement[0];
+    camera.pos[1] += rotated_movement[1];
+    camera.pos[2] += rotated_movement[2];
+
+    mat4x4 translation_mat;
+    mat4x4_translate(translation_mat, camera.pos[0], camera.pos[1], camera.pos[2]);
+
+    mat4x4_mul(view, pitch_mat, yaw_mat);
+    mat4x4_mul(view, view, translation_mat);
+    glUniformMatrix4fv(uniView, 1, GL_FALSE, (const GLfloat *)&view);
+
     mat4x4_perspective(proj, 60 * M_PI / 180, ratio, 0.1f, 10.0f);
     glUniformMatrix4fv(uniProj, 1, GL_FALSE, (const GLfloat *)&proj);
 
-    mat4x4_rotate(matrix, ident, 0.0f, 0.0f, 1.0f, glfwGetTime() * 3.141);
     glUniformMatrix4fv(uniModel, 1, GL_FALSE, (const GLfloat *)&matrix);
 
     glDrawArrays(GL_POINTS, 0, num_verticies);

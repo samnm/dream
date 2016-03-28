@@ -80,6 +80,27 @@ LINMATH_H_DEFINE_VEC(2)
 LINMATH_H_DEFINE_VEC(3)
 LINMATH_H_DEFINE_VEC(4)
 
+static inline void vec2_set(vec2 r, float x, float y)
+{
+  r[0] = x;
+  r[1] = y;
+}
+
+static inline void vec3_set(vec3 r, float x, float y, float z)
+{
+  r[0] = x;
+  r[1] = y;
+  r[2] = z;
+}
+
+static inline void vec4_set(vec4 r, float x, float y, float z, float w)
+{
+  r[0] = x;
+  r[1] = y;
+  r[2] = z;
+  r[3] = w;
+}
+
 static inline void vec3_mul_cross(vec3 r, vec3 const a, vec3 const b)
 {
   r[0] = a[1]*b[2] - a[2]*b[1];
