@@ -134,6 +134,7 @@ int main(void)
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1);
 
+  glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
@@ -162,13 +163,11 @@ int main(void)
 
   // Create and compile the shaders
   GLuint vertexShader = loadShader(GL_VERTEX_SHADER, DREAM_VERT);
-  GLuint geometryShader = loadShader(GL_GEOMETRY_SHADER, DREAM_GEOM);
   GLuint fragmentShader = loadShader(GL_FRAGMENT_SHADER, DREAM_FRAG);
 
   // Link the vertex and fragment shader into a shader program
   GLuint shaderProgram = glCreateProgram();
   glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, geometryShader);
   glAttachShader(shaderProgram, fragmentShader);
   glBindFragDataLocation(shaderProgram, 0, "outColor");
   glLinkProgram(shaderProgram);
@@ -262,7 +261,6 @@ int main(void)
 
   glDeleteProgram(shaderProgram);
   glDeleteShader(fragmentShader);
-  glDeleteShader(geometryShader);
   glDeleteShader(vertexShader);
 
   glDeleteBuffers(1, &vbo);
