@@ -1,9 +1,9 @@
 
 CC = cc
 EXEC = dream
-CFLAGS = -Wall -Werror -Wno-missing-braces -DGLFW_INCLUDE_GLCOREARB
+CFLAGS = -Wall -Werror -Wno-deprecated-declarations -Wno-missing-braces -DGLFW_INCLUDE_GLCOREARB
 FRAMEWORKS = -framework Cocoa -framework OpenGL -framework IOKit
-LIBS = -lglfw3
+LIBS = -lglfw
 SOURCES=$(wildcard src/*.c)
 OBJS=$(SOURCES:.cpp=.o)
 
